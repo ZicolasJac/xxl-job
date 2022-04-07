@@ -56,19 +56,20 @@ public class JobRegistryHelper {
 		registryMonitorThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				// 30s执行一次
 				while (!toStop) {
 					try {
-						// auto registry group
+						// 查询自动注册的执行器
 						List<XxlJobGroup> groupList = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().findByAddressType(0);
 						if (groupList!=null && !groupList.isEmpty()) {
 
-							// remove dead address (admin/executor)
+							// 清除死亡的自动注册地址(90s未更新的)
 							List<Integer> ids = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findDead(RegistryConfig.DEAD_TIMEOUT, new Date());
 							if (ids!=null && ids.size()>0) {
 								XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().removeDead(ids);
 							}
 
-							// fresh online address (admin/executor)
+							// 收集存活的自动注册的执行器地址(90s内更新过的)
 							HashMap<String, List<String>> appAddressMap = new HashMap<String, List<String>>();
 							List<XxlJobRegistry> list = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findAll(RegistryConfig.DEAD_TIMEOUT, new Date());
 							if (list != null) {
@@ -88,7 +89,7 @@ public class JobRegistryHelper {
 								}
 							}
 
-							// fresh group address
+							// 刷新执行器地址
 							for (XxlJobGroup group: groupList) {
 								List<String> registryList = appAddressMap.get(group.getAppname());
 								String addressListStr = null;

@@ -21,13 +21,13 @@ public class XxlJobScheduler  {
 
 
     public void init() throws Exception {
-        // init i18n
+        // 国际化
         initI18n();
 
-        // admin trigger pool start
+        // 创建两个触发器线程池, 快速触发和缓慢触发
         JobTriggerPoolHelper.toStart();
 
-        // admin registry monitor run
+        // 每隔30s处理自动注册的执行器地址, 更新到执行器表
         JobRegistryHelper.getInstance().start();
 
         // admin fail-monitor run
